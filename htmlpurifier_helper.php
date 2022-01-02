@@ -1,14 +1,10 @@
 <?php
 
-defined('BASEPATH') or exit('No direct script access allowed');
-
-/*
- * Codeigniter HTMLPurifier Helper
- *
+/**
  * Purify input using the HTMLPurifier standalone class.
  * Easily use multiple purifier configurations.
  *
- * @author     Tyler Brownell <tyler.brownell@mssociety.ca>
+ * @author     Tyler Brownell <tyler.brownell@mssociety.ca>, Windpie <wzf28@sina.com>,
  * @copyright  Public Domain
  *
  * @access  public
@@ -16,7 +12,18 @@ defined('BASEPATH') or exit('No direct script access allowed');
  * @param   string           $config      The name of the configuration (switch case) to use.
  * @return  string or array               The cleaned string (or array of strings).
  */
-if (!function_exists('html_purify')) {
+
+// CodeIgniter 4 HTMLPurifier Helper
+
+if (! function_exists('html_purify')) {
+    /**
+     *
+     * @access  public
+     * @param array|string $dirty_html      A string (or array of strings) to be cleaned.
+     * @param string $config                The name of the configuration (switch case) to use.
+     * @return array|string                 The cleaned string (or array of strings).
+     */
+
     function html_purify($dirty_html, $config = false)
     {
         if (is_array($dirty_html)) {
@@ -24,12 +31,11 @@ if (!function_exists('html_purify')) {
                 $clean_html[$key] = html_purify($val, $config);
             }
         } else {
-            $ci = &get_instance();
-
+            $charset = config('app')->charset;
             switch ($config) {
                 case 'comment':
                     $config = \HTMLPurifier_Config::createDefault();
-                    $config->set('Core.Encoding', $ci->config->item('charset'));
+                    $config->set('Core.Encoding', $charset);
                     $config->set('HTML.Doctype', 'XHTML 1.0 Strict');
                     $config->set('HTML.Allowed', 'p,a[href|title],abbr[title],acronym[title],b,strong,blockquote[cite],code,em,i,strike');
                     $config->set('AutoFormat.AutoParagraph', true);
@@ -39,12 +45,12 @@ if (!function_exists('html_purify')) {
 
                 case false:
                     $config = \HTMLPurifier_Config::createDefault();
-                    $config->set('Core.Encoding', $ci->config->item('charset'));
+                    $config->set('Core.Encoding', $charset);
                     $config->set('HTML.Doctype', 'XHTML 1.0 Strict');
                     break;
 
                 default:
-                    show_error('The HTMLPurifier configuration labeled "'.htmlspecialchars($config, ENT_QUOTES, $ci->config->item('charset')).'" could not be found.');
+                    show_error('The HTMLPurifier configuration labeled "'.htmlspecialchars($config, ENT_QUOTES, $charset).'" could not be found.');
             }
 
             $purifier = new \HTMLPurifier($config);
@@ -54,6 +60,3 @@ if (!function_exists('html_purify')) {
         return $clean_html;
     }
 }
-
-/* End of htmlpurifier_helper.php */
-/* Location: ./application/helpers/htmlpurifier_helper.php */
