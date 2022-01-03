@@ -4,7 +4,7 @@
  * Purify input using the HTMLPurifier standalone class.
  * Easily use multiple purifier configurations.
  *
- * @author     Tyler Brownell <tyler.brownell@mssociety.ca>, Windpie <wzf28@sina.com>,
+ * @author     Tyler Brownell <tyler.brownell@mssociety.ca>, Windpie <wzf28@sina.com>
  * @copyright  Public Domain
  *
  * @access  public
@@ -55,6 +55,17 @@ if (! function_exists('html_purify')) {
 
             $purifier = new \HTMLPurifier($config);
             $clean_html = $purifier->purify($dirty_html);
+        }
+
+        if ($def = $config->getHTMLDefinition(true)) {
+            $def->addElement('oembed', 'Block', 'Flow', 'Common');
+            $def->addElement(
+                'figure',
+                'Block',
+                'Optional: (oembed, Flow) | (Flow, oembed) | Flow',
+                'Common'
+            );
+            $def->addAttribute('oembed', 'url', "Text");
         }
 
         return $clean_html;
